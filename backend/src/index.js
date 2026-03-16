@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const rateLimit = require('./middleware/rateLimit');
 
 const recommendRoute = require('./routes/recommend');
 
@@ -8,6 +9,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use('/api/recommend', rateLimit);
 app.use('/api', recommendRoute);
 
 const PORT = process.env.PORT || 4000;
