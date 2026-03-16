@@ -1,0 +1,61 @@
+import { useState } from 'react'
+import ArtistInput from '../components/ArtistInput'
+import MoodPicker from '../components/MoodPicker'
+import SongCard from '../components/SongCard'
+import { useRecommend } from '../hooks/useRecommend'
+
+export default function Home() {
+  const [mode, setMode] = useState('artist')
+  const { songs, loading, error, recommend } = useRecommend()
+
+  return (
+    <div className="container">
+      <header>
+        <h1 className="logo">TUNEFEEL</h1>
+        <p className="tagline">AI가 찾아주는 나만의 플레이리스트</p>
+      </header>
+
+      <div className="mode-toggle">
+        <button
+          className={`mode-btn ${mode === 'artist' ? 'active' : ''}`}
+          onClick={() => setMode('artist')}
+        >
+          🎤 아티스트 기반
+        </button>
+        <button
+          className={`mode-btn ${mode === 'mood' ? 'active' : ''}`}
+          onClick={() => setMode('mood')}
+        >
+          🌙 기분 기반
+        </button>
+      </div>
+
+      {mode === 'artist' ? (
+        <ArtistInput onRecommend={recommend} loading={loading} />
+      ) : (
+        <MoodPicker onRecommend={recommend} loading={loading} />
+      )}
+
+      {error && <div className="error-box">{error}</div>}
+
+      {loading && (
+        <div className="loading">
+          <div className="spinner"></div>
+          <p>AI가 플레이리스트를 만들고 있어요...</p>
+        </div>
+      )}
+
+      {songs.length > 0 && (
+        <div className="results">
+          <div className="results-header">
+            <h2>추천 플레이리스트</h2>
+            <span>{songs.length}곡</span>
+          </div>
+          {songs.map((song, i) => (
+            <SongCard key={i} song={song} index={i} />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
