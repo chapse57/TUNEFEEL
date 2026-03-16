@@ -30,23 +30,21 @@ ${params.lang ? '언어: ' + params.lang : ''}
   }
 
   const response = await axios.post(
-    'https://api.anthropic.com/v1/messages',
-    {
-
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1000,
+    'https://api.openai.com/v1/chat/completions',
+    JSON.stringify({
+      model: 'gpt-4o-mini',
       messages: [{ role: 'user', content: prompt }],
-    },
+      max_tokens: 1000,
+    }),
     {
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
       },
     }
   );
 
-  const text = response.data.content[0].text;
+  const text = response.data.choices[0].message.content;
   const clean = text.replace(/```json|```/g, '').trim();
   return JSON.parse(clean);
 }
