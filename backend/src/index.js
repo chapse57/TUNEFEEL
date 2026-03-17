@@ -14,8 +14,8 @@ const paymentsRoute = require('./routes/payments');
 const app = express();
 
 app.use(cors({
-  origin: 'https://tunefeel.vercel.app',
-  methods: ['GET', 'POST'],
+  origin: '*',
+  methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
