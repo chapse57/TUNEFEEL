@@ -4,16 +4,37 @@ import MoodPicker from '../components/MoodPicker'
 import SongCard from '../components/SongCard'
 import { useRecommend } from '../hooks/useRecommend'
 
-export default function Home() {
+export default function Home({ user, onLogout }) {
   const [mode, setMode] = useState('artist')
   const { songs, loading, error, recommend } = useRecommend()
 
   return (
     <div className="container">
       <header>
-        <h1 className="logo">TUNEFEEL</h1>
-        <p className="tagline">AI가 찾아주는 나만의 플레이리스트</p>
-      </header>
+  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+    <div>
+      <h1 className="logo">TUNEFEEL</h1>
+      <p className="tagline">AI가 찾아주는 나만의 플레이리스트</p>
+    </div>
+    <div style={{ textAlign: 'right' }}>
+      <p style={{ fontSize: '0.75rem', color: '#777', marginBottom: '6px' }}>{user?.email}</p>
+      <button
+        onClick={onLogout}
+        style={{
+          background: 'transparent',
+          border: '1px solid rgba(255,255,255,0.1)',
+          color: '#777',
+          padding: '5px 12px',
+          borderRadius: '6px',
+          cursor: 'pointer',
+          fontSize: '0.75rem'
+        }}
+      >
+        로그아웃
+      </button>
+    </div>
+  </div>
+</header>
 
       <div className="mode-toggle">
         <button

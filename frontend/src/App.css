@@ -309,3 +309,24 @@ body {
   .logo { font-size: 3rem; }
   .song-links { flex-direction: row; }
 }
+
+
+/* Auth */
+.auth-box {
+  background: #141414;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.success-box {
+  background: rgba(200,241,53,0.08);
+  border: 1px solid rgba(200,241,53,0.2);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  color: #c8f135;
+  font-size: 0.85rem;
+  margin-top: 1rem;
+}
