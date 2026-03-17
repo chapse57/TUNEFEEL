@@ -13,6 +13,13 @@ const authRoute = require('./routes/auth');
 const paymentsRoute = require('./routes/payments');
 
 const app = express();
+
+app.use(cors({
+  origin: 'https://tunefeel.vercel.app',
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(cors());
 app.use(express.json());
 
