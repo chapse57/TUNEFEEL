@@ -1,4 +1,9 @@
 require('dotenv').config();
+
+// 환경변수 확인용 로그 추가
+console.log('SUPABASE_URL:', process.env.SUPABASE_URL);
+console.log('SUPABASE_SERVICE_KEY:', process.env.SUPABASE_SERVICE_KEY ? '있음' : '없음');
+
 const express = require('express');
 const cors = require('cors');
 const rateLimit = require('./middleware/rateLimit');
