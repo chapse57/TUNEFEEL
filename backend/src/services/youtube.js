@@ -25,13 +25,21 @@ async function searchYouTube(title, artist) {
   if (topicVideo) return `https://www.youtube.com/watch?v=${topicVideo.id.videoId}`;
 
   // 2순위: 제목+아티스트 둘 다 포함
+  const autoVideo = items.find(item =>
+    item.snippet.description?.toLowerCase().includes('auto-generated') ||
+    item.snippet.description?.toLowerCase().includes('provided to youtube')
+  );
+  if (autoVideo) return `https://www.youtube.com/watch?v=${autoVideo.id.videoId}`;
+
+
+  // 3순위: 제목만 포함
   const exactMatch = items.find(item => {
     const t = item.snippet.title.toLowerCase();
     return t.includes(title.toLowerCase()) && t.includes(artist.toLowerCase());
   });
   if (exactMatch) return `https://www.youtube.com/watch?v=${exactMatch.id.videoId}`;
 
-  // 3순위: 제목만 포함
+  // 4순위: 제목만 포함
   const titleMatch = items.find(item =>
     item.snippet.title.toLowerCase().includes(title.toLowerCase())
   );
