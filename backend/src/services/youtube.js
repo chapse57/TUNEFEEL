@@ -1,7 +1,6 @@
 const axios = require('axios');
 
 async function searchYouTube(title, artist) {
-  // 따옴표 제거하고 자연스러운 쿼리로
   const query = `${artist} ${title} official`
   
   const response = await axios.get('https://www.googleapis.com/youtube/v3/search', {
@@ -10,7 +9,7 @@ async function searchYouTube(title, artist) {
       q: query,
       part: 'snippet',
       type: 'video',
-      maxResults: 5,
+      maxResults: 10, // 5 → 10으로 늘리기
       videoCategoryId: '10',
       order: 'relevance'
     }
@@ -19,16 +18,27 @@ async function searchYouTube(title, artist) {
   const items = response.data.items;
   if (!items || items.length === 0) return null;
 
-  const best = items.find(item => {
-    const channelTitle = item.snippet.channelTitle.toLowerCase();
-    return channelTitle.includes('topic')
-  }) || items.find(item => {
-    const videoTitle = item.snippet.title.toLowerCase();
-    return videoTitle.includes(title.toLowerCase()) && 
-           videoTitle.includes(artist.toLowerCase())
-  }) || items[0];
+  // 1순위: Topic 채널
+  const topicVideo = items.find(item =>
+    item.snippet.channelTitle.toLowerCase().includes('topic')
+  );
+  if (topicVideo) return `https://www.youtube.com/watch?v=${topicVideo.id.videoId}`;
 
-  return `https://www.youtube.com/watch?v=${best.id.videoId}`;
+  // 2순위: audio 키워드 포함
+  const audioVideo = items.find(item =>
+    item.snippet.title.toLowerCase().includes('audio')
+  );
+  if (audioVideo) return `https://www.youtube.com/watch?v=${audioVideo.id.videoId}`;
+
+  // 3순위: 제목+아티스트 둘 다 포함
+  const exactMatch = items.find(item => {
+    const t = item.snippet.title.toLowerCase();
+    return t.includes(title.toLowerCase()) && t.includes(artist.toLowerCase());
+  });
+  if (exactMatch) return `https://www.youtube.com/watch?v=${exactMatch.id.videoId}`;
+
+  // 4순위: 그냥 첫 번째
+  return `https://www.youtube.com/watch?v=${items[0].id.videoId}`;
 }
 
 module.exports = { searchYouTube };
