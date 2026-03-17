@@ -3,10 +3,27 @@ import ArtistInput from '../components/ArtistInput'
 import MoodPicker from '../components/MoodPicker'
 import SongCard from '../components/SongCard'
 import { useRecommend } from '../hooks/useRecommend'
+import { supabase } from '../lib/supabase'
+import axios from 'axios'
 
 export default function Home({ user, onLogout }) {
   const [mode, setMode] = useState('artist')
   const { songs, loading, error, recommend } = useRecommend()
+  const handleUpgrade = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+  
+      const res = await axios.post(
+        'http://localhost:4000/api/payments/checkout',
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+      window.location.href = res.data.url
+    } catch (err) {
+      alert('결제 페이지 연결 실패. 다시 시도해주세요.')
+    }
+  }
 
   return (
     <div className="container">
@@ -18,20 +35,39 @@ export default function Home({ user, onLogout }) {
     </div>
     <div style={{ textAlign: 'right' }}>
       <p style={{ fontSize: '0.75rem', color: '#777', marginBottom: '6px' }}>{user?.email}</p>
-      <button
-        onClick={onLogout}
-        style={{
-          background: 'transparent',
-          border: '1px solid rgba(255,255,255,0.1)',
-          color: '#777',
-          padding: '5px 12px',
-          borderRadius: '6px',
-          cursor: 'pointer',
-          fontSize: '0.75rem'
-        }}
-      >
-        로그아웃
-      </button>
+      <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+        {user && (
+          <button
+            onClick={handleUpgrade}
+            style={{
+              background: '#c8f135',
+              border: 'none',
+              color: '#000',
+              padding: '5px 12px',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '0.75rem',
+              fontWeight: '700'
+            }}
+          >
+            ⭐ 프리미엄
+          </button>
+        )}
+        <button
+          onClick={onLogout}
+          style={{
+            background: 'transparent',
+            border: '1px solid rgba(255,255,255,0.1)',
+            color: '#777',
+            padding: '5px 12px',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontSize: '0.75rem'
+          }}
+        >
+          로그아웃
+        </button>
+      </div>
     </div>
   </div>
 </header>
