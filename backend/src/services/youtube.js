@@ -19,14 +19,13 @@ async function searchYouTube(title, artist) {
   const items = response.data.items;
   if (!items || items.length === 0) return null;
 
-  // 아티스트명 + 곡명 둘 다 포함된 영상 우선
   const best = items.find(item => {
+    const channelTitle = item.snippet.channelTitle.toLowerCase();
+    return channelTitle.includes('topic')
+  }) || items.find(item => {
     const videoTitle = item.snippet.title.toLowerCase();
     return videoTitle.includes(title.toLowerCase()) && 
            videoTitle.includes(artist.toLowerCase())
-  }) || items.find(item => {
-    const videoTitle = item.snippet.title.toLowerCase();
-    return videoTitle.includes(title.toLowerCase())
   }) || items[0];
 
   return `https://www.youtube.com/watch?v=${best.id.videoId}`;
