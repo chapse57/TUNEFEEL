@@ -1,10 +1,21 @@
 const axios = require('axios');
 
-// MV/뮤직비디오 영상인지 체크
 function isMusicVideo(title) {
-  const mvKeywords = ['mv', 'm/v', 'music video', '뮤직비디오', 'official mv', 'official m/v'];
+  const mvKeywords = ['mv', 'm/v', 'music video', '뮤직비디오', 'official mv', 'official m/v', 'remix', 'remixed', 'ver.', 'version', 'live', 'cover', 'inst', 'instrumental'];
   const t = title.toLowerCase();
   return mvKeywords.some(keyword => t.includes(keyword));
+}
+
+// 영상 제목이 곡 제목을 포함하는지 체크 (교집합 방식)
+function titleMatches(videoTitle, songTitle) {
+  const vt = videoTitle.toLowerCase();
+  const st = songTitle.toLowerCase();
+  
+  // 곡 제목을 단어로 분리
+  const words = st.split(/[\s\(\)]+/).filter(w => w.length > 1);
+  
+  // 모든 단어가 영상 제목에 포함되면 매칭
+  return words.every(word => vt.includes(word));
 }
 
 async function searchWithQuery(query, title, artist) {
@@ -23,10 +34,11 @@ async function searchWithQuery(query, title, artist) {
   const items = response.data.items;
   if (!items || items.length === 0) return null;
 
-  // Topic 채널이면서 MV 아닌 것
+  // Topic 채널이면서 MV 아니고 제목 매칭
   const topicVideo = items.find(item =>
     item.snippet.channelTitle.toLowerCase().includes('topic') &&
-    !isMusicVideo(item.snippet.title)
+    !isMusicVideo(item.snippet.title) &&
+    titleMatches(item.snippet.title, title)
   );
   if (topicVideo) return `https://www.youtube.com/watch?v=${topicVideo.id.videoId}`;
 
@@ -54,37 +66,30 @@ async function searchYouTube(title, artist) {
   const items = response.data.items;
   if (!items || items.length === 0) return null;
 
-  // Topic 채널이면서 MV 아닌 것
+  // Topic 채널이면서 MV 아니고 제목 매칭
   const topicVideo = items.find(item =>
     item.snippet.channelTitle.toLowerCase().includes('topic') &&
-    !isMusicVideo(item.snippet.title)
+    !isMusicVideo(item.snippet.title) &&
+    titleMatches(item.snippet.title, title)
   );
   if (topicVideo) return `https://www.youtube.com/watch?v=${topicVideo.id.videoId}`;
 
-  // auto-generated이면서 MV 아닌 것
+  // auto-generated이면서 MV 아니고 제목 매칭
   const autoVideo = items.find(item =>
-    !isMusicVideo(item.snippet.title) && (
+    !isMusicVideo(item.snippet.title) &&
+    titleMatches(item.snippet.title, title) && (
       item.snippet.description?.toLowerCase().includes('auto-generated') ||
       item.snippet.description?.toLowerCase().includes('provided to youtube')
     )
   );
   if (autoVideo) return `https://www.youtube.com/watch?v=${autoVideo.id.videoId}`;
 
-  // MV 아닌 것 중에서 제목+아티스트 포함
-  const exactMatch = items.find(item => {
-    const t = item.snippet.title.toLowerCase();
-    return !isMusicVideo(item.snippet.title) &&
-           t.includes(title.toLowerCase()) &&
-           t.includes(artist.toLowerCase());
-  });
-  if (exactMatch) return `https://www.youtube.com/watch?v=${exactMatch.id.videoId}`;
-
-  // MV 아닌 것 중 제목만 포함
-  const titleMatch = items.find(item =>
+  // MV 아니고 제목+아티스트 매칭
+  const exactMatch = items.find(item =>
     !isMusicVideo(item.snippet.title) &&
-    item.snippet.title.toLowerCase().includes(title.toLowerCase())
+    titleMatches(item.snippet.title, title)
   );
-  if (titleMatch) return `https://www.youtube.com/watch?v=${titleMatch.id.videoId}`;
+  if (exactMatch) return `https://www.youtube.com/watch?v=${exactMatch.id.videoId}`;
 
   // 그래도 없으면 첫 번째
   return `https://www.youtube.com/watch?v=${items[0].id.videoId}`;
