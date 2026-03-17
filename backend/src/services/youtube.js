@@ -1,7 +1,8 @@
 const axios = require('axios');
 
 async function searchYouTube(title, artist) {
-  const query = `"${title}" "${artist}"`
+  // 따옴표 제거하고 자연스러운 쿼리로
+  const query = `${artist} ${title} official`
   
   const response = await axios.get('https://www.googleapis.com/youtube/v3/search', {
     params: {
@@ -18,8 +19,12 @@ async function searchYouTube(title, artist) {
   const items = response.data.items;
   if (!items || items.length === 0) return null;
 
-  // 제목에 곡명 포함된 영상 우선
+  // 아티스트명 + 곡명 둘 다 포함된 영상 우선
   const best = items.find(item => {
+    const videoTitle = item.snippet.title.toLowerCase();
+    return videoTitle.includes(title.toLowerCase()) && 
+           videoTitle.includes(artist.toLowerCase())
+  }) || items.find(item => {
     const videoTitle = item.snippet.title.toLowerCase();
     return videoTitle.includes(title.toLowerCase())
   }) || items[0];
