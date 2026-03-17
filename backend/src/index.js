@@ -1,6 +1,5 @@
 require('dotenv').config();
 
-// 환경변수 확인용 로그 추가
 console.log('SUPABASE_URL:', process.env.SUPABASE_URL);
 console.log('SUPABASE_SERVICE_KEY:', process.env.SUPABASE_SERVICE_KEY ? '있음' : '없음');
 
@@ -20,7 +19,6 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.use(cors());
 app.use(express.json());
 
 app.use('/api/recommend', rateLimit);
