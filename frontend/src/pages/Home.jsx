@@ -15,7 +15,7 @@ export default function Home({ user, onLogout }) {
       const token = session?.access_token
   
       const res = await axios.post(
-        'http://localhost:4000/api/payments/checkout',
+        `${import.meta.env.VITE_API_URL}/api/payments/checkout`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       )
