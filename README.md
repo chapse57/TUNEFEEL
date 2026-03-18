@@ -18,7 +18,8 @@ TUNEFEEL은 좋아하는 아티스트나 현재 기분을 입력하면 AI가 감
 - 🎤 **아티스트 기반 추천** — 좋아하는 아티스트와 비슷한 감성의 곡 추천
 - 🌙 **기분 기반 추천** — 현재 기분/분위기에 맞는 곡 추천
 - 💬 **추천 이유 제공** — 왜 이 곡인지 감성적인 설명 제공
-- ▶️ **YouTube / Spotify 바로가기** — 추천받은 곡 바로 감상 가능
+- ▶️ **YouTube 직접 재생** — Topic 채널 우선 매칭으로 음원 영상 바로 재생
+- 🎵 **Spotify 바로가기** — 추천받은 곡 Spotify에서 바로 검색
 - 🔒 **하루 3회 무료 제한** — IP 기반 사용량 제한
 - 🔐 **이메일 회원가입/로그인** — Supabase 인증
 - 💳 **프리미엄 결제** — Stripe 연동 ($4.99/월)
@@ -31,6 +32,7 @@ TUNEFEEL은 좋아하는 아티스트나 현재 기분을 입력하면 AI가 감
 | 백엔드 | Node.js + Express |
 | AI 추천 엔진 | Anthropic Claude Sonnet |
 | 음악 데이터 | Last.fm API |
+| YouTube 연동 | YouTube Data API v3 |
 | 인증 | Supabase |
 | 결제 | Stripe |
 | DB | Supabase (users, playlists) |
@@ -51,9 +53,11 @@ Last.fm API → 실제 존재하는 유사 아티스트/곡 데이터 수집
     ↓
 Claude Sonnet → 감성/가사 분석 후 최종 큐레이션
     ↓
-YouTube API → 직접 재생 가능한 영상 URL 매칭
+YouTube Data API → Topic 채널 우선 음원 영상 URL 매칭
     ↓
 YouTube / Spotify 링크와 함께 추천 결과 반환
+    ↓
+Stripe Webhook → 결제 완료 시 Supabase DB 프리미엄 업데이트
 ```
 
 ## 🚀 로컬 실행
@@ -121,6 +125,11 @@ VITE_SUPABASE_ANON_KEY=your_key
 - `2026-03-17` Railway 백엔드 배포 완료
 - `2026-03-17` CORS 설정 및 환경변수 이슈 해결
 - `2026-03-17` YouTube API 직접 영상 URL 매칭으로 개선
+- `2026-03-18` Stripe Webhook 설정 완료
+- `2026-03-18` Supabase users 테이블 트리거 추가 (신규 가입 자동 등록)
+- `2026-03-18` 결제 완료 시 프리미엄 플랜 자동 업데이트 완료
+- `2026-03-18` YouTube Topic 채널 우선 매칭으로 음원 영상 정확도 개선
+- `2026-03-18` MV/뮤직비디오 필터링 추가로 음원 영상 품질 향상
 
 ## 📄 라이선스
 
