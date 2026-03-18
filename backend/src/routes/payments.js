@@ -21,7 +21,7 @@ router.post('/checkout', async (req, res) => {
       }],
       customer_email: user.email,
       success_url: `${process.env.FRONTEND_URL}/?payment=success`,
-cancel_url: `${process.env.FRONTEND_URL}/?payment=cancel`,
+      cancel_url: `${process.env.FRONTEND_URL}/?payment=cancel`,
       metadata: { user_id: user.id }
     });
 
@@ -32,8 +32,8 @@ cancel_url: `${process.env.FRONTEND_URL}/?payment=cancel`,
   }
 });
 
-// Webhook - 결제 완료 후 플랜 업그레이드
-router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+// Webhook handler
+const handleWebhook = async (req, res) => {
   const sig = req.headers['stripe-signature'];
   let event;
 
@@ -58,7 +58,7 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
   }
 
   res.json({ received: true });
-});
+};
 
 module.exports = router;
-
+module.exports.handleWebhook = handleWebhook;

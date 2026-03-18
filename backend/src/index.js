@@ -18,12 +18,18 @@ app.use(cors({
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+app.post('/api/payments/webhook', 
+  express.raw({ type: 'application/json' }), 
+  (req, res, next) => {
+    require('./routes/payments').handleWebhook(req, res);
+  }
+);
 
-app.use(express.json());
 
 app.use('/api/recommend', rateLimit);
 app.use('/api', recommendRoute);
 app.use('/api/auth', authRoute);
+app.use(express.json());
 app.use('/api/payments', paymentsRoute);
 
 const PORT = process.env.PORT || 4000;
