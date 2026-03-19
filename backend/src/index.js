@@ -20,18 +20,17 @@ app.use(cors({
 }));
 app.post('/api/payments/webhook', 
   express.raw({ type: 'application/json' }), 
-  (req, res, next) => {
+  (req, res) => {
     require('./routes/payments').handleWebhook(req, res);
   }
 );
 
+app.use(express.json()); // ← 위로 올리기!
 
 app.use('/api/recommend', rateLimit);
 app.use('/api', recommendRoute);
 app.use('/api/auth', authRoute);
-app.use(express.json());
 app.use('/api/payments', paymentsRoute);
-
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`서버 실행 중: http://localhost:${PORT}`);
