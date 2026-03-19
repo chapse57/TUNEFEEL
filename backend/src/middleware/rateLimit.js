@@ -7,19 +7,26 @@ async function rateLimit(req, res, next) {
   
   // 토큰 있으면 프리미엄 체크
   if (token) {
-    const { data: { user } } = await supabase.auth.getUser(token)
-    if (user) {
-      const { data } = await supabase
-        .from('users')
-        .select('plan')
-        .eq('id', user.id)
-        .single()
-      
-        if (data?.plan === 'premium') {
+    try {
+      const { data, error } = await supabase.auth.getUser(token)
+      console.log('auth.getUser 결과:', JSON.stringify(data))
+      console.log('auth.getUser 에러:', JSON.stringify(error))
+      if (data?.user) {
+        const { data: userData, error: dbError } = await supabase
+          .from('users')
+          .select('plan')
+          .eq('id', data.user.id)
+          .single()
+        console.log('users 조회 결과:', JSON.stringify(userData))
+        console.log('users 조회 에러:', JSON.stringify(dbError))
+        if (userData?.plan === 'premium') {
           res.setHeader('X-RateLimit-Remaining', 'unlimited')
           return next()
         }
       }
+    } catch (e) {
+      console.log('rateLimit 예외:', e.message)
+    }
   }
 
   // 무료 유저는 IP 기반 3회 제한
