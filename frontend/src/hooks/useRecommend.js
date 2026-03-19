@@ -6,6 +6,7 @@ export function useRecommend() {
   const [songs, setSongs] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [remaining, setRemaining] = useState(3)
 
   const recommend = async (mode, params) => {
     setLoading(true)
@@ -22,9 +23,12 @@ export function useRecommend() {
         { headers: { Authorization: `Bearer ${token}` } }
       )
       setSongs(res.data.songs)
+      const remainingHeader = res.headers['x-ratelimit-remaining']
+      if (remainingHeader !== undefined) setRemaining(Number(remainingHeader))
     } catch (err) {
       if (err.response?.status === 429) {
-        setError('오늘 무료 추천 횟수(3회)를 모두 사용했어요. 프리미엄으로 업그레이드하세요!')
+        setRemaining(0)
+        setError('오늘 무료 추천 횟수(3회)를 모두 사용했어요.')
       } else {
         setError('추천을 가져오지 못했어요. 다시 시도해주세요.')
       }
@@ -33,5 +37,5 @@ export function useRecommend() {
     }
   }
 
-  return { songs, loading, error, recommend }
+  return { songs, loading, error, recommend, remaining }
 }

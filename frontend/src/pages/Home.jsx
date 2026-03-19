@@ -8,8 +8,8 @@ import axios from 'axios'
 
 export default function Home({ user, plan, onLogout }) {
   const [mode, setMode] = useState('artist')
-  const { songs, loading, error, recommend } = useRecommend()
-
+  const { songs, loading, error, recommend, remaining } = useRecommend()
+  
   const handleUpgrade = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession()
@@ -113,10 +113,10 @@ export default function Home({ user, plan, onLogout }) {
           fontSize: '0.8rem',
           marginTop: '8px'
         }}>
-          무료 플랜은 하루 3회 추천 가능해요.
+          이용횟수: ({3 - remaining}/{3})
           <span
             onClick={handleUpgrade}
-            style={{ color: '#c8f135', cursor: 'pointer', marginLeft: '4px' }}
+            style={{ color: '#c8f135', cursor: 'pointer', marginLeft: '8px' }}
           >
             프리미엄 업그레이드 →
           </span>
