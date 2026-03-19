@@ -24,7 +24,11 @@ export function useRecommend() {
       )
       setSongs(res.data.songs)
       const remainingHeader = res.headers['x-ratelimit-remaining']
-      if (remainingHeader !== undefined) setRemaining(Number(remainingHeader))
+      if (remainingHeader === 'unlimited') {
+        setRemaining(999)
+      } else if (remainingHeader !== undefined) {
+        setRemaining(Number(remainingHeader))
+      }
     } catch (err) {
       if (err.response?.status === 429) {
         setRemaining(0)

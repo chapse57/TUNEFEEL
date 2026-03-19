@@ -15,8 +15,11 @@ async function rateLimit(req, res, next) {
         .eq('id', user.id)
         .single()
       
-      if (data?.plan === 'premium') return next() // 프리미엄이면 바로 통과
-    }
+        if (data?.plan === 'premium') {
+          res.setHeader('X-RateLimit-Remaining', 'unlimited')
+          return next()
+        }
+      }
   }
 
   // 무료 유저는 IP 기반 3회 제한

@@ -106,7 +106,7 @@ export default function Home({ user, plan, onLogout }) {
       )}
 
       {/* 무료 플랜 안내 */}
-      {true && (
+      {plan === 'free' && (
         <p style={{
           textAlign: 'center',
           color: '#777',
