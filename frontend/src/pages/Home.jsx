@@ -6,14 +6,14 @@ import { useRecommend } from '../hooks/useRecommend'
 import { supabase } from '../lib/supabase'
 import axios from 'axios'
 
-export default function Home({ user, onLogout }) {
+export default function Home({ user, plan, onLogout }) {
   const [mode, setMode] = useState('artist')
   const { songs, loading, error, recommend } = useRecommend()
+
   const handleUpgrade = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession()
       const token = session?.access_token
-  
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/payments/checkout`,
         {},
@@ -28,49 +28,61 @@ export default function Home({ user, onLogout }) {
   return (
     <div className="container">
       <header>
-  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-    <div>
-      <h1 className="logo">TUNEFEEL</h1>
-      <p className="tagline">AI가 찾아주는 나만의 플레이리스트</p>
-    </div>
-    <div style={{ textAlign: 'right' }}>
-      <p style={{ fontSize: '0.75rem', color: '#777', marginBottom: '6px' }}>{user?.email}</p>
-      <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-        {user && (
-          <button
-            onClick={handleUpgrade}
-            style={{
-              background: '#c8f135',
-              border: 'none',
-              color: '#000',
-              padding: '5px 12px',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '0.75rem',
-              fontWeight: '700'
-            }}
-          >
-            ⭐ 프리미엄
-          </button>
-        )}
-        <button
-          onClick={onLogout}
-          style={{
-            background: 'transparent',
-            border: '1px solid rgba(255,255,255,0.1)',
-            color: '#777',
-            padding: '5px 12px',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '0.75rem'
-          }}
-        >
-          로그아웃
-        </button>
-      </div>
-    </div>
-  </div>
-</header>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div>
+            <h1 className="logo">TUNEFEEL</h1>
+            <p className="tagline">AI가 찾아주는 나만의 플레이리스트</p>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <p style={{ fontSize: '0.75rem', color: '#777', marginBottom: '6px' }}>{user?.email}</p>
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+              {plan === 'premium' ? (
+                <span style={{
+                  background: 'transparent',
+                  border: '1px solid #c8f135',
+                  color: '#c8f135',
+                  padding: '5px 12px',
+                  borderRadius: '6px',
+                  fontSize: '0.75rem',
+                  fontWeight: '700'
+                }}>
+                  ⭐ 프리미엄
+                </span>
+              ) : (
+                <button
+                  onClick={handleUpgrade}
+                  style={{
+                    background: '#c8f135',
+                    border: 'none',
+                    color: '#000',
+                    padding: '5px 12px',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '0.75rem',
+                    fontWeight: '700'
+                  }}
+                >
+                  ⭐ 프리미엄
+                </button>
+              )}
+              <button
+                onClick={onLogout}
+                style={{
+                  background: 'transparent',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  color: '#777',
+                  padding: '5px 12px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '0.75rem'
+                }}
+              >
+                로그아웃
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
 
       <div className="mode-toggle">
         <button
@@ -91,6 +103,24 @@ export default function Home({ user, onLogout }) {
         <ArtistInput onRecommend={recommend} loading={loading} />
       ) : (
         <MoodPicker onRecommend={recommend} loading={loading} />
+      )}
+
+      {/* 무료 플랜 안내 */}
+      {plan === 'free' && (
+        <p style={{
+          textAlign: 'center',
+          color: '#777',
+          fontSize: '0.8rem',
+          marginTop: '8px'
+        }}>
+          무료 플랜은 하루 3회 추천 가능해요.
+          <span
+            onClick={handleUpgrade}
+            style={{ color: '#c8f135', cursor: 'pointer', marginLeft: '4px' }}
+          >
+            프리미엄 업그레이드 →
+          </span>
+        </p>
       )}
 
       {error && <div className="error-box">{error}</div>}

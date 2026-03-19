@@ -6,18 +6,29 @@ import './App.css'
 
 function App() {
   const [user, setUser] = useState(null)
+  const [plan, setPlan] = useState('free')
   const [loading, setLoading] = useState(true)
 
+  const fetchPlan = async (userId) => {
+    const { data } = await supabase
+      .from('users')
+      .select('plan')
+      .eq('id', userId)
+      .single()
+    if (data) setPlan(data.plan)
+  }
+
   useEffect(() => {
-    // 현재 로그인 상태 확인
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
+      if (session?.user) fetchPlan(session.user.id)
       setLoading(false)
     })
 
-    // 로그인 상태 변경 감지
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
+      if (session?.user) fetchPlan(session.user.id)
+      else setPlan('free')
     })
 
     return () => subscription.unsubscribe()
@@ -26,6 +37,7 @@ function App() {
   const handleLogout = async () => {
     await supabase.auth.signOut()
     setUser(null)
+    setPlan('free')
   }
 
   if (loading) return null
@@ -33,7 +45,7 @@ function App() {
   return (
     <div className="app">
       {user ? (
-        <Home user={user} onLogout={handleLogout} />
+        <Home user={user} plan={plan} onLogout={handleLogout} />
       ) : (
         <Login onLogin={setUser} />
       )}
