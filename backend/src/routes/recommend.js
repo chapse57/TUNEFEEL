@@ -10,7 +10,7 @@ router.post('/recommend', async (req, res) => {
 
     const songs = await Promise.all(
       result.songs.map(async (song) => {
-        const youtubeUrl = await searchYouTube(song.title, song.artist);
+        const youtubeUrl = await searchYouTube(song.title, song.artist).catch(() => null);
         return {
           ...song,
           youtubeUrl: youtubeUrl || `https://www.youtube.com/results?search_query=${encodeURIComponent(song.title + ' ' + song.artist)}`,
