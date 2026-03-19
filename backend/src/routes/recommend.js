@@ -22,6 +22,8 @@ router.post('/recommend', async (req, res) => {
     res.json({ songs });
   } catch (err) {
     console.error('에러 전체:', err.message);
+    console.error('에러 스택:', err.stack);
+    console.error('에러 응답:', JSON.stringify(err.response?.data));
     res.status(500).json({ error: '추천을 가져오지 못했어요' });
   }
 });
